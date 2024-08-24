@@ -11,12 +11,10 @@ from flask import request, jsonify, send_file
 from backend import app
 import backend.db as db
 
-
 @app.route('/', methods=['GET'])
 def index():
     return send_file('index.html')
 
-# @app.route('/api/create_user', methods=['POST'])
 @app.route('/api/create_user', methods=['POST'])
 def create_user():
     data = request.json
@@ -24,18 +22,22 @@ def create_user():
     username = data.get('username')
     fullname = data.get('fullname')
     interest = data.get('interest')
+    password = data.get('password')
 
-    if not username or not fullname or not interest:
+    if not username or not fullname or not interest or not password:
         return jsonify({"error": "Missing required fields"}), 400
+
+    hashed_password = db.hash_password(password)
 
     user_data = {
         "username": username,
         "fullname": fullname,
         "interest": interest,
+        "password": hashed_password,
         "last_location": {
             "Latitude": 0,
             "Longitude": 0,
-            "ttl": 0
+            "end_time": None
         }
     }
 
@@ -46,6 +48,27 @@ def create_user():
 
     return jsonify({"message": message}), 201
 
+@app.route('/api/verify_login', methods=['POST'])
+def verify_login():
+    data = request.json
+
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({"error": "Missing required fields"}), 400
+
+    user_data = db.load_user(username)
+
+    if not user_data:
+        return jsonify({"error": "Invalid username or password"}), 400
+
+    stored_password = user_data.get('password')
+
+    if db.check_password(stored_password, password):
+        return jsonify({"message": "Login successful"}), 200
+    else:
+        return jsonify({"error": "Invalid username or password"}), 400
 
 @app.route('/api/update_location', methods=['POST'])
 def update_location():

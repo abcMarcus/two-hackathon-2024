@@ -1,12 +1,11 @@
 import os
 import json
+import bcrypt
 from datetime import datetime, timedelta
-
 from math import radians, cos, sin, sqrt, atan2
 
 DB_DIR = "DB"
 
-# Ensure the DB directory exists
 if not os.path.exists(DB_DIR):
     os.makedirs(DB_DIR)
 
@@ -31,6 +30,14 @@ def load_user(username):
     with open(user_file, 'r') as f:
         return json.load(f)
 
+def hash_password(password):
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed.decode('utf-8')
+
+def check_password(stored_password, provided_password):
+    return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
+
 def update_location(username, latitude, longitude, ttl_minutes=60):
     user_file = os.path.join(DB_DIR, f"{username}.json")
     
@@ -40,7 +47,6 @@ def update_location(username, latitude, longitude, ttl_minutes=60):
     with open(user_file, 'r') as f:
         user_data = json.load(f)
     
-    # Calculate end time from ttl_minutes
     end_time = datetime.now() + timedelta(minutes=ttl_minutes)
     end_time_str = end_time.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -52,7 +58,6 @@ def update_location(username, latitude, longitude, ttl_minutes=60):
         json.dump(user_data, f)
 
     return True, "Location updated successfully"
-
 
 def check_ttl_and_clear(username):
     user_file = os.path.join(DB_DIR, f"{username}.json")
@@ -112,8 +117,6 @@ def get_nearby_users(username, distance_km):
         if other_user_file == f"{username}.json":
             continue
         
-
-        check_ttl_and_clear(username)
         with open(os.path.join(DB_DIR, other_user_file), 'r') as f:
             other_user_data = json.load(f)
         
