@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
     "deploy": "gh-pages -t -d dist",
     "predeploy": "expo export -p web",
     "android": "expo start --android",
