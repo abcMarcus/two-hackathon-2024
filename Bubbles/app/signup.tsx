@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Input, Icon } from '@rneui/themed';
 import styles from '../assets/stylesheet';
-import { useNavigation } from 'expo-router';
+import { useNavigation, router } from 'expo-router';
 
 
 export default function SignUp () {
@@ -11,18 +11,64 @@ export default function SignUp () {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [validSignUp, setValidSignUp] = useState('false');
+
+  const updateUsername = (newUsername: string) =>  {
+    const maxLength = 20;
+    if (newUsername.length < maxLength) {
+      setUsernameError('');
+      setUsername(newUsername);
+    } else {
+      setUsernameError(`Username cannot be longer than ${maxLength} characters.`);
+    }
+  }
+
+  const updatePassword = (newPassword: string) => {
+    const capitalLetterRegex = /[A-Z]/;
+    const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;
+    const numberRegex = /\d/;
+    const minPasswordLength = 8;
+    if (newPassword.length < minPasswordLength) {
+      setPasswordError(`Password must be atleast ${minPasswordLength} long.`);
+    } else if (!capitalLetterRegex.test(newPassword) || !specialCharacterRegex.test(newPassword) || !numberRegex.test(newPassword)) {
+      setPasswordError('Password must contain at least one capital letter, one special character, and one number.');
+    } else {
+      setPasswordError('');
+    }
+    setPassword(newPassword);
+  }
+
+  const updateConfirmPassword = (confirmPassword: string) => {
+    if (password !== confirmPassword) {
+      setConfirmPasswordError("error: password does not match!");
+    } else {
+      setConfirmPasswordError('');
+    }
+    setConfirmPassword(confirmPassword);
+  }
+
   const handleBack = () => {
-      navigation.navigate('welcome');
+      router.push("/welcome");
   };
   const handleContinue = () => {
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+    if (password !== confirmPassword || username.length < 1 || 
+        passwordError != '' || confirmPasswordError != '' || usernameError != ''
+    ) {
+      Alert.alert('Failed', 'Something went wrong, please try again');
+      console.log("failed signup");
       return;
     }
-    
+
     // Here you would typically call an API to register the user
     console.log('Sign up with:', { username, email, password });
     Alert.alert('Success', 'Account created successfully!');
+    router.push({
+      pathname: '/(tabs)/home', 
+      params: {username, email, password}
+    });
     // Reset form or navigate to another screen
   };
 
@@ -34,7 +80,9 @@ export default function SignUp () {
         style={styles.input}
         placeholder="Username"
         value={username}
-        onChangeText={setUsername}
+        errorStyle={{ color: '#f33958' }}
+        errorMessage = { usernameError }
+        onChangeText={updateUsername}
         autoCapitalize="none"
       />
       
@@ -51,7 +99,9 @@ export default function SignUp () {
         style={styles.input}
         placeholder="Password"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={updatePassword}
+        errorStyle={{ color: '#f33958' }}
+        errorMessage= {passwordError}
         secureTextEntry
       />
       
@@ -59,9 +109,9 @@ export default function SignUp () {
         style={styles.input}
         placeholder="Confirm Password"
         value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        // errorStyle={{ color: 'red' }}
-        // errorMessage='ENTER A VALID ERROR HERE'
+        onChangeText={updateConfirmPassword}
+        errorStyle={{ color: '#f33958' }}
+        errorMessage= { confirmPasswordError }
         secureTextEntry
       />
 
