@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, View, Keyboard, TouchableWithoutFeedback, Image, Platform, TouchableOpacity  } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import Bubble from '@/components/Bubble';
 import ChatInput from '@/components/ChatInput';
+import { useNavigation } from '@react-navigation/native';
 
 export default function HomeScreen() {
   const [isChatVisible, setChatVisible] = useState(false);
@@ -13,8 +14,9 @@ export default function HomeScreen() {
   const handleBubblePress = () => {
     setChatVisible(true);  // Show the chat input when a bubble is clicked
   };
-
+  
   const handleTextChange = (text: string) => {
+    const navigation = useNavigation(); 
     setMessage(text);  // Update the message state as user types
   };
 
@@ -32,8 +34,8 @@ export default function HomeScreen() {
     setMessage(''); // Clear message input
     Keyboard.dismiss(); // Dismiss keyboard
   };
-
   return (
+
     <TouchableWithoutFeedback onPress={handleOutsidePress}>
       <ThemedView style={styles.container}>
         <ThemedText type="title" style={styles.greeting}>
