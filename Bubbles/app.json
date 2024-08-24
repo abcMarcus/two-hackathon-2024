@@ -23,14 +23,15 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
+      "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       "expo-router"
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "baseUrl": "/two-hackathon-2024"
     },
     "extra": {
       "router": {
@@ -40,6 +41,12 @@
         "projectId": "3e06e7cb-a7f8-4416-a028-845c1afe2db1"
       }
     },
-    "owner": "shionjl"
+    "owner": "shionjl",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/3e06e7cb-a7f8-4416-a028-845c1afe2db1"
+    }
   }
 }
