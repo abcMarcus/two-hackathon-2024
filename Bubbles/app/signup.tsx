@@ -63,9 +63,12 @@ export default function SignUp () {
     }
 
     // Here you would typically call an API to register the user
-    console.log('Sign up with:', { username, password });
+    console.log('Sign up with:', { username, email, password });
     Alert.alert('Success', 'Account created successfully!');
-    router.push('/(tabs)/home');
+    router.push({
+      pathname: '/(tabs)/home', 
+      params: {username, email, password}
+    });
     // Reset form or navigate to another screen
   };
 
