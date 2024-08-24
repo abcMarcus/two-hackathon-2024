@@ -1,63 +1,91 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Keyboard, TouchableWithoutFeedback, Image, Platform, TouchableOpacity  } from 'react-native';
+import { StyleSheet, View, Keyboard, TouchableWithoutFeedback, Image, Platform, TouchableOpacity, Alert, Dimensions} from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import Bubble from '@/components/Bubble';
 import ChatInput from '@/components/ChatInput';
 import { useNavigation } from '@react-navigation/native';
 
+type User = {
+  id: number;
+  name: string;
+};
+
+const users: User[] = [
+  { id: 1, name: 'John Doe' },
+  { id: 2, name: 'Jane Smith' },
+  { id: 3, name: 'Alice Johnson' },
+  { id: 4, name: 'Bob Brown' },
+  { id: 5, name: 'Charlie White' },
+  // Add more users here
+];
+
+
+const getBubblePositions = (numBubbles: number) => {
+  const { width, height } = Dimensions.get('window');
+  const positions = [];
+  const radius = 150; // Radius from center where bubbles will be positioned
+  const bubbleSize = 100; // Size of each bubble
+
+  for (let i = 0; i < numBubbles; i++) {
+    const angle = (i / numBubbles) * 2 * Math.PI; // Full circle angle
+    const x = radius * Math.cos(angle); // Center and adjust bubble radius
+    const y = radius * Math.sin(angle); // Center and adjust bubble radius
+    positions.push({ left: x, top: y });
+  }
+
+  return positions;
+};
+
 export default function HomeScreen() {
-  const [isChatVisible, setChatVisible] = useState(false);
-  const [message, setMessage] = useState('');
-  const [savedMessages, setSavedMessages] = useState<string[]>([]); // State to save messages
+  const navigation = useNavigation();
+  const bubblePositions = getBubblePositions(users.length);
+  console.log(bubblePositions)
 
-  const handleBubblePress = () => {
-    setChatVisible(true);  // Show the chat input when a bubble is clicked
-  };
-  
-  const handleTextChange = (text: string) => {
-    //const navigation = useNavigation(); 
-    setMessage(text);  // Update the message state as user types
-  };
-
-  const handleSend = () => {
-    // Save the message and hide the chat input
-    console.log('Message sent:', message);
-    setSavedMessages((prevMessages) => [...prevMessages, message]);
-    setMessage('');
-    setChatVisible(false);
-    Keyboard.dismiss(); // Dismiss keyboard
+  const handleBubblePress = (user: User) => {
+    console.log('home recognises click');
+    Alert.alert(
+      `Connect with ${user.name}?`,
+      'Would you like to connect with this user?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Yes',
+          onPress: () => navigation.navigate('chat/[id]', { userId: user.id, userName: user.name }),
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
-  const handleOutsidePress = () => {
-    setChatVisible(false); // Hide chat input
-    setMessage(''); // Clear message input
-    Keyboard.dismiss(); // Dismiss keyboard
-  };
   return (
+    <TouchableWithoutFeedback>
+    <ThemedView style={styles.container}>
+      <ThemedText type="title" style={styles.greeting}>
+        Hello,
+      </ThemedText>
+      <ThemedText type="title" style={styles.username}>
+        username!
+      </ThemedText>
 
-    <TouchableWithoutFeedback onPress={handleOutsidePress}>
-      <ThemedView style={styles.container}>
-        <ThemedText type="title" style={styles.greeting}>
-          Hello,
-        </ThemedText>
-        <ThemedText type="title" style={styles.username}>
-          username!
-        </ThemedText>
 
-        {/* Static bubbles */}
-        <Bubble style={{ top: 30, left: 48 }} onPress={handleBubblePress} />
-        <Bubble style={{ top: 0, left: 200 }} onPress={handleBubblePress} />
-        <Bubble style={{ top: 0, left: 65 }} onPress={handleBubblePress} />
-
-        {/* Chat input */}
-        <ChatInput
-          visible={isChatVisible}
-          onChangeText={handleTextChange}
-          value={message}
-          onSend={handleSend}
+      {users.map((user, index) => (
+          <Bubble
+          key={user.id}
+          style={[
+            styles.bubble,
+            { top: bubblePositions[index].top, left: bubblePositions[index].left },
+            { position: 'absolute' }
+          ]}
+          onPress={() => handleBubblePress(user)}
         />
-      </ThemedView>
+        ))}
+
+      <Bubble key={0} 
+      style={{ backgroundColor: 'transparent', borderWidth: 0, shadowOpacity: 0 }}
+      onPress={() => {}}
+      hide={true} /> 
+    </ThemedView>
     </TouchableWithoutFeedback>
   );
 }
@@ -65,17 +93,26 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    paddingTop: 50,
+    paddingTop: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
     position: 'relative', // Ensure proper positioning of children
   },
   greeting: {
     fontStyle: 'normal',
-    paddingLeft: 20,
+
   },
   username: {
     fontStyle: 'italic',
-    paddingLeft: 20,
+  },
+  bubble: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'lightblue', // Ensure visibility
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1, // Ensure it is above other components
   },
 });

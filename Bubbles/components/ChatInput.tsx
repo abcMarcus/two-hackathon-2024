@@ -1,5 +1,8 @@
 import React from 'react';
 import { TextInput, StyleSheet, View, Button } from 'react-native';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import { ThemedTextInput } from '@/components/ThemedTextInput';
 
 type ChatInputProps = {
   visible: boolean;
@@ -13,7 +16,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ visible, value, onChangeText, onS
 
   return (
     <View style={styles.container}>
-      <TextInput
+      <ThemedTextInput
         style={styles.input}
         value={value}
         onChangeText={onChangeText}
@@ -41,6 +44,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 24,
     padding: 8,
+    opacity: 0.8,
   },
 });
 
