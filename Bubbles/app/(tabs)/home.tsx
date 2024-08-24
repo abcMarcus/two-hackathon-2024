@@ -1,6 +1,6 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Alert } from 'react-native';
-import { StyleSheet, View, Keyboard, TouchableWithoutFeedback, Image, Platform, TouchableOpacity  } from 'react-native';
+import { StyleSheet, View, Keyboard, TouchableWithoutFeedback, Image, Platform, TouchableOpacity, Alert, Dimensions} from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import Bubble from '@/components/Bubble';
@@ -10,7 +10,7 @@ import { useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 
-const API_BASE_URL = 'https://sydneyhome.ddns.net';
+const API_BASE_URL = 'http://sydneyhome.ddns.net';
 const LOCATION_UPDATE_INTERVAL = 60 * 1000; // 1 minutes in milliseconds
 
 
@@ -40,6 +40,37 @@ const getCookie = async (name: string) => {
   } catch (e) {
     console.error('Failed to get cookie', e);
   }
+};
+
+type User = {
+  id: number;
+  name: string;
+};
+
+const users: User[] = [
+  { id: 1, name: 'John Doe' },
+  { id: 2, name: 'Jane Smith' },
+  { id: 3, name: 'Alice Johnson' },
+  { id: 4, name: 'Bob Brown' },
+  { id: 5, name: 'Charlie White' },
+  // Add more users here
+];
+
+
+const getBubblePositions = (numBubbles: number) => {
+  const { width, height } = Dimensions.get('window');
+  const positions = [];
+  const radius = 150; // Radius from center where bubbles will be positioned
+  const bubbleSize = 100; // Size of each bubble
+
+  for (let i = 0; i < numBubbles; i++) {
+    const angle = (i / numBubbles) * 2 * Math.PI; // Full circle angle
+    const x = radius * Math.cos(angle); // Center and adjust bubble radius
+    const y = radius * Math.sin(angle); // Center and adjust bubble radius
+    positions.push({ left: x, top: y });
+  }
+
+  return positions;
 };
 
 export default function HomeScreen() {
@@ -127,7 +158,7 @@ export default function HomeScreen() {
       let location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
 
-      const response = await fetch(`${API_BASE_URL}/api/update_location`, {
+      const response = await fetch(`http://sydneyhome.ddns.net/api/update_location`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -190,61 +221,56 @@ export default function HomeScreen() {
   };
 
 
-  const handleBubblePress = () => {
-    setChatVisible(true);  // Show the chat input when a bubble is clicked
-  };
-  
-  const handleTextChange = (text: string) => {
-    //const navigation = useNavigation(); 
-    setMessage(text);  // Update the message state as user types
+  const navigation = useNavigation();
+  const bubblePositions = getBubblePositions(users.length);
+  console.log(bubblePositions)
+
+
+  const handleBubblePress = (user: User) => {
+    console.log('home recognises click');
+    Alert.alert(
+      `Connect with ${user.name}?`,
+      'Would you like to connect with this user?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Yes',
+          onPress: () => navigation.navigate('chat/[id]', { userId: user.id, userName: user.name }),
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
-  const handleSend = () => {
-    // Save the message and hide the chat input
-    console.log('Message sent:', message);
-    setSavedMessages((prevMessages) => [...prevMessages, message]);
-    setMessage('');
-    setChatVisible(false);
-    Keyboard.dismiss(); // Dismiss keyboard
-  };
-
-  const handleOutsidePress = () => {
-    setChatVisible(false); // Hide chat input
-    setMessage(''); // Clear message input
-    Keyboard.dismiss(); // Dismiss keyboard
-  };
   return (
+    <TouchableWithoutFeedback>
+    <ThemedView style={styles.container}>
+      <ThemedText type="title" style={styles.greeting}>
+        Hello,
+      </ThemedText>
+      <ThemedText type="title" style={styles.username}>
+        {storedUsername || 'Guest'}!
+      </ThemedText>
 
-    <TouchableWithoutFeedback onPress={handleOutsidePress}>
-      <ThemedView style={styles.container}>
-        <ThemedText type="title" style={styles.greeting}>
-          Hello,
-        </ThemedText>
-        <ThemedText type="title" style={styles.username}>
-          {storedUsername || 'Guest'}!
-        </ThemedText>
 
-        {/* Static bubbles */}
-        <Bubble style={{ top: 30, left: 48 }} onPress={handleBubblePress} />
-        <Bubble style={{ top: 0, left: 200 }} onPress={handleBubblePress} />
-        <Bubble style={{ top: 0, left: 65 }} onPress={handleBubblePress} />
 
-        {nearbyUsers.map((user, index) => (
-          <Bubble 
-            key={index}
-            style={{ top: 30 + index * 60, left: 48 + index * 30 }} 
-            onPress={handleBubblePress}
-            label={user.username}
-          />
-        ))}
-        {/* Chat input */}
-        <ChatInput
-          visible={isChatVisible}
-          onChangeText={handleTextChange}
-          value={message}
-          onSend={handleSend}
+      {users.map((user, index) => (
+          <Bubble
+          key={user.id}
+          style={[
+            styles.bubble,
+            { top: bubblePositions[index].top, left: bubblePositions[index].left },
+            { position: 'absolute' }
+          ]}
+          onPress={() => handleBubblePress(user)}
         />
-      </ThemedView>
+        ))}
+
+      <Bubble key={0} 
+      style={{ backgroundColor: 'transparent', borderWidth: 0, shadowOpacity: 0 }}
+      onPress={() => {}}
+      hide={true} /> 
+    </ThemedView>
     </TouchableWithoutFeedback>
   );
 }
@@ -252,17 +278,26 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    paddingTop: 50,
+    paddingTop: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
     position: 'relative', // Ensure proper positioning of children
   },
   greeting: {
     fontStyle: 'normal',
-    paddingLeft: 20,
+
   },
   username: {
     fontStyle: 'italic',
-    paddingLeft: 20,
+  },
+  bubble: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'lightblue', // Ensure visibility
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1, // Ensure it is above other components
   },
 });
