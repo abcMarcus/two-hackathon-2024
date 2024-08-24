@@ -36,6 +36,8 @@ def hash_password(password):
     return hashed.decode('utf-8')
 
 def check_password(stored_password, provided_password):
+    if not stored_password or not provided_password:
+        return False
     return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
 
 def update_location(username, latitude, longitude, ttl_minutes=60):
