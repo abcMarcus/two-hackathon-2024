@@ -1,3 +1,4 @@
+
 # Routes:
 
 ## Endpoints
@@ -50,3 +51,8 @@
   - `200 OK`: Returns a JSON array of all users' data.
 
 
+# Installing
+ - run `python3 -m venv venv`
+ - run `source venv/bin/activate`
+ - run `pip install -r requirements`
+ - run `python3 -m spacy download en_core_web_md` 
