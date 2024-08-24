@@ -1,70 +1,79 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import React, { useState } from 'react';
+import { StyleSheet, View, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import Bubble from '@/components/Bubble';
+import ChatInput from '@/components/ChatInput';
 
 export default function HomeScreen() {
+  const [isChatVisible, setChatVisible] = useState(false);
+  const [message, setMessage] = useState('');
+  const [savedMessages, setSavedMessages] = useState<string[]>([]); // State to save messages
+
+  const handleBubblePress = () => {
+    setChatVisible(true);  // Show the chat input when a bubble is clicked
+  };
+
+  const handleTextChange = (text: string) => {
+    setMessage(text);  // Update the message state as user types
+  };
+
+  const handleSend = () => {
+    // Save the message and hide the chat input
+    console.log('Message sent:', message);
+    setSavedMessages((prevMessages) => [...prevMessages, message]);
+    setMessage('');
+    setChatVisible(false);
+    Keyboard.dismiss(); // Dismiss keyboard
+  };
+
+  const handleOutsidePress = () => {
+    setChatVisible(false); // Hide chat input
+    setMessage(''); // Clear message input
+    Keyboard.dismiss(); // Dismiss keyboard
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <TouchableWithoutFeedback onPress={handleOutsidePress}>
+      <ThemedView style={styles.container}>
+        <ThemedText type="title" style={styles.greeting}>
+          Hello,
+        </ThemedText>
+        <ThemedText type="title" style={styles.username}>
+          username!
+        </ThemedText>
+
+        {/* Static bubbles */}
+        <Bubble style={{ top: 30, left: 48 }} onPress={handleBubblePress} />
+        <Bubble style={{ top: 0, left: 200 }} onPress={handleBubblePress} />
+        <Bubble style={{ top: 0, left: 65 }} onPress={handleBubblePress} />
+
+        {/* Chat input */}
+        <ChatInput
+          visible={isChatVisible}
+          onChangeText={handleTextChange}
+          value={message}
+          onSend={handleSend}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    paddingTop: 50,
+    position: 'relative', // Ensure proper positioning of children
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  greeting: {
+    fontStyle: 'normal',
+    paddingLeft: 20,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  username: {
+    fontStyle: 'italic',
+    paddingLeft: 20,
   },
 });

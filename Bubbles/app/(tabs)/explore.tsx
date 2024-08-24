@@ -100,3 +100,61 @@ const styles = StyleSheet.create({
     gap: 8,
   },
 });
+
+// // HomeScreen.js
+// import React, { useState } from 'react';
+// import { StyleSheet, View } from 'react-native';
+// import { ThemedText } from '../components/ThemedText';
+// import { ThemedView } from '../components/ThemedView';
+// import Bubble from '../components/Bubble';
+// import ChatInput from '../components/ChatInput';
+
+// export default function HomeScreen() {
+//   const [isChatVisible, setChatVisible] = useState(false);
+//   const [message, setMessage] = useState('');
+
+//   const handleBubblePress = () => {
+//     setChatVisible(true);  // Show the chat input when a bubble is clicked
+//   };
+
+//   const handleTextChange = (text) => {
+//     setMessage(text);  // Update the message state as user types
+//   };
+
+//   return (
+//     <ThemedView style={styles.container}>
+//       <ThemedText type="title" style={styles.greeting}>
+//         Hello,
+//       </ThemedText>
+//       <ThemedText type="title" style={styles.username}>
+//         username!
+//       </ThemedText>
+
+//       {/* Static bubbles */}
+//       <Bubble style={{ top: 100, left: 50 }} onPress={handleBubblePress} />
+//       <Bubble style={{ top: 200, left: 150 }} onPress={handleBubblePress} />
+//       <Bubble style={{ top: 300, left: 250 }} onPress={handleBubblePress} />
+
+//       {/* Chat input */}
+//       <ChatInput visible={isChatVisible} onChangeText={handleTextChange} value={message} />
+//     </ThemedView>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     justifyContent: 'flex-start',
+//     alignItems: 'flex-start',
+//     paddingTop: 50,
+//     position: 'relative',  // Ensure proper positioning of children
+//   },
+//   greeting: {
+//     fontStyle: 'normal',
+//     paddingLeft: 20,
+//   },
+//   username: {
+//     fontStyle: 'italic',
+//     paddingLeft: 20,
+//   },
+// });
