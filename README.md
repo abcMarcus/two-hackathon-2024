@@ -1,4 +1,3 @@
-
 # Routes:
 
 ## Endpoints
@@ -49,7 +48,6 @@
 - **Description**: Retrieves the data of all users stored in the system.
 - **Response**:
   - `200 OK`: Returns a JSON array of all users' data.
-
 
 # Installing
  - run `python3 -m venv venv`
