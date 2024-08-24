@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Button, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
+import { View, Button, FlatList, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 //import socket from '@/hooks/socket'; // import your socket instance
 import { ThemedTextInput } from '@/components/ThemedTextInput';
 import { ThemedText } from '@/components/ThemedText';
@@ -15,6 +15,11 @@ const ChatScreen = () => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const { userId, userName } = useLocalSearchParams();
   const socket = useRef(io(SOCKET_URL)).current;
+
+  const handleProfilePress = (user: User) => {
+    console.log('Profile pressed:', user);
+    //navigation.navigate('chat/[id]', { userId: user.id, userName: user.name });
+  };
 
   useEffect(() => {
     // Listen for keyboard show and hide events
@@ -61,6 +66,15 @@ const ChatScreen = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 5 : 0} // Adjust this value if needed
     >
+      <View style={styles.container}>
+        <TouchableOpacity 
+          key={userId} 
+          onPress={() => handleProfilePress(userId)}
+          style={styles.chatItem} // Apply styles directly to TouchableOpacity
+        >
+          <ThemedText type="subtitle">{userName}</ThemedText>
+        </TouchableOpacity>
+    </View>
       <FlatList
         data={messages}
         renderItem={({ item }) => (
@@ -87,7 +101,11 @@ const ChatScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 10,
+    paddingTop: 40,
+  },
+  chatItem: {
+    padding: 15,
   },
   listContainer: {
     flexGrow: 1,
