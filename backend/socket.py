@@ -11,10 +11,12 @@ online_users = {}
 def connect():
     username = session.get("username")
     if not username:
+        print("kicked, no username in session")
         raise ConnectionRefusedError("Invalid username")
 
     # Add the user to the online users dictionary
     online_users[username] = request.sid
+    emit('connect')
 
 @socketio.on('disconnect')
 def disconnect():
