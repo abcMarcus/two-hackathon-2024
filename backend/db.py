@@ -1,6 +1,7 @@
 import os
 import json
 import bcrypt
+import csv
 from datetime import datetime, timedelta
 from math import radians, cos, sin, sqrt, atan2
 
@@ -135,3 +136,33 @@ def get_nearby_users(username, distance_km):
     
     return nearby_users, "Nearby users retrieved"
 
+def get_message_filename(user1, user2):
+    """Generate a lexicographically ordered filename for two users."""
+    if user1 > user2:
+        user1, user2 = user2, user1
+    return os.path.join(DB_DIR, f"{user1}+{user2}.csv")
+
+def save_message(sender, recipient, message):
+    """Save a message with timestamp to a CSV file."""
+    filename = get_message_filename(sender, recipient)
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    with open(filename, 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow([timestamp, sender, recipient, message])
+
+def get_messages(user1, user2, latest=False):
+    """Retrieve messages between two users, optionally return only the latest message."""
+    filename = get_message_filename(user1, user2)
+    if not os.path.exists(filename):
+        return []
+
+    messages = []
+    with open(filename, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            messages.append(row)
+    
+    if latest:
+        return [messages[-1]] if messages else []
+    return messages

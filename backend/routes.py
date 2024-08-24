@@ -6,7 +6,7 @@ Mostly handle user location
 import os 
 import json
 
-from flask import request, jsonify, send_file
+from flask import request, jsonify, send_file, session
 
 from backend import app
 import backend.db as db
@@ -46,6 +46,7 @@ def create_user():
     if not success:
         return jsonify({"error": message}), 400
 
+    session['username'] = username
     return jsonify({"message": message}), 201
 
 @app.route('/api/verify_login', methods=['POST'])
@@ -66,6 +67,7 @@ def verify_login():
     stored_password = user_data.get('password')
 
     if db.check_password(stored_password, password):
+        session['username'] = username
         return jsonify({"message": "Login successful"}), 200
     else:
         return jsonify({"error": "Invalid username or password"}), 400
