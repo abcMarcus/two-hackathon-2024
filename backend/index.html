@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Information</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Fullname</th>
+                <th>Interest</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>End Time</th>
+            </tr>
+        </thead>
+        <tbody id="userTableBody">
+        </tbody>
+    </table>
+
+    <script>
+        async function fetchUsers() {
+            const response = await fetch('/api/get_all_users');
+            const users = await response.json();
+            
+            const tableBody = document.getElementById('userTableBody');
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.fullname}</td>
+                    <td>${user.interest}</td>
+                    <td>${user.last_location.Latitude}</td>
+                    <td>${user.last_location.Longitude}</td>
+                    <td>${user.last_location.end_time}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        fetchUsers();
+    </script>
+</body>
+</html>
+
