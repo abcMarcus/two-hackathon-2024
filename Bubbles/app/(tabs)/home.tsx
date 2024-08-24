@@ -55,6 +55,13 @@ export default function HomeScreen() {
           </TouchableOpacity>
           <ThemedText type="defaultSemiBold">to go to the welcome page</ThemedText>
       </View>
+      <View>
+        <ThemedText type="subtitle">Redirecting!</ThemedText>
+          <TouchableOpacity onPress={() => navigation.navigate('signup' as never)}>
+            <ThemedText darkColor='#FF00FF'>Click here</ThemedText>
+          </TouchableOpacity>
+          <ThemedText type="defaultSemiBold">to go to the welcome page</ThemedText>
+      </View>
     </ParallaxScrollView>
   );
 }

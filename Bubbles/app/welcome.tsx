@@ -1,14 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import styles from '../assets/stylesheet';
+import { useNavigation } from '@react-navigation/native';
+
 
 interface WelcomePageProps {
   // You can add any props here if needed
 }
 
 export default function WelcomePage() {
+  const navigation = useNavigation();
   const handleSignUp = (): void => {
     // Add your sign up logic here
     console.log('Sign Up button pressed');
+    navigation.navigate('signup' as never);
   };
 
   const handleSignIn = (): void => {
@@ -18,39 +23,16 @@ export default function WelcomePage() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome!</Text>
+        <View style={styles.textWrapper}>
+          <Text style={[styles.welcome_title, {marginBottom: 0}]}>Welcome</Text>
+          <Text style={[styles.welcome_title, {fontStyle:'italic'}]}>to Bubbles!</Text>
+      </View>
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Sign Up</Text>
+        <Text style={[styles.buttonText, {backgroundColor:'#F99955'}]}>Sign Up</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleSignIn}>
-        <Text style={styles.buttonText}>Sign In</Text>
+        <Text style={[styles.buttonText, {backgroundColor:'#777777'}]}>Sign In</Text>
       </TouchableOpacity>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-    marginVertical: 10,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
