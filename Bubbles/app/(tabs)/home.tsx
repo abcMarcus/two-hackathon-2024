@@ -16,7 +16,7 @@ export default function HomeScreen() {
   };
   
   const handleTextChange = (text: string) => {
-    const navigation = useNavigation(); 
+    //const navigation = useNavigation(); 
     setMessage(text);  // Update the message state as user types
   };
 
