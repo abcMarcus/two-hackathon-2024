@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'reac
 import { Input, Icon } from '@rneui/themed';
 import styles from '../assets/stylesheet';
 import { useNavigation, router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function SignUp () {
@@ -53,7 +54,7 @@ export default function SignUp () {
   const handleBack = () => {
       router.push("/welcome");
   };
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (password !== confirmPassword || username.length < 1 || 
         passwordError != '' || confirmPasswordError != '' || usernameError != ''
     ) {
@@ -62,13 +63,21 @@ export default function SignUp () {
       return;
     }
 
-    // Here you would typically call an API to register the user
-    console.log('Sign up with:', { username, email, password });
-    Alert.alert('Success', 'Account created successfully!');
-    router.push({
-      pathname: '/(tabs)/home', 
-      params: {username, email, password}
-    });
+    try {
+      await AsyncStorage.setItem('username', username);
+      console.log('Username saved:', username);
+
+      // Here you would typically call an API to register the user
+      console.log('Sign up with:', { username, email, password });
+      Alert.alert('Success', 'Account created successfully!');
+      router.push({
+        pathname: '/(tabs)/home', 
+        params: {username, email, password}
+      });
+    } catch (error) {
+      console.error('Failed to save username:', error);
+    }
+
     // Reset form or navigate to another screen
   };
 
