@@ -558,12 +558,12 @@ export default function ProfileScreen() {
       </View>
       <View style={styles.profileSection}>
         <Image
-          source={{ uri: 'https://via.placeholder.com/170' }} // Placeholder image URL
+          source={{ uri: 'https://i.imgur.com/9LcmFac.jpeg' }} // Placeholder image URL
           style={styles.profileImage}
         />
         <View style={styles.centeredDetailsContainer}>
           <ThemedText type="body" style={styles.city}>
-            New York City placeholderText
+            Just a dog man, doing fine! Hit me up for some Basketball!
           </ThemedText>
           <ThemedText type="body" style={styles.connections}>
             150 <ThemedText type="body" style={styles.label}>connections</ThemedText>
