@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, Alert, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Input } from '@rneui/themed';
 import styles from '../assets/stylesheet';
 import { router, useRouter } from 'expo-router';
@@ -76,7 +76,13 @@ export default function SignUp() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardAvoidingView}
+      >
+        <ScrollView contentContainerStyle={styles.scrollView}>
+
       <Text style={styles.welcome_title}>Sign Up</Text>
 
       <Input
@@ -126,6 +132,8 @@ export default function SignUp() {
           <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
       </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  </SafeAreaView>
   );
 }
