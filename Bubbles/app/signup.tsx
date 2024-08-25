@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, Alert, TouchableOpacity } from 'react-native';
+import { Button, View, Text, Alert, TouchableOpacity } from 'react-native';
 import { Input } from '@rneui/themed';
 import styles from '../assets/stylesheet';
 import { router, useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 
 const handleContinue = async (username: string, fullname: string, password: string) => {
   const userInfoJSON = JSON.stringify({
@@ -75,10 +76,28 @@ export default function SignUp() {
     await handleContinue(username, fullname, password);
   };
 
+  const [image, setImage] = useState<string | null>(null);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.welcome_title}>Sign Up</Text>
 
+      <Button title="Upload Profile Picture" onPress={pickImage} />
+      
+      {image && <Text>Image selected: {image}</Text>}
       <Input
         style={styles.input}
         placeholder="Username"
