@@ -9,14 +9,20 @@ online_users = {}
 
 @socketio.on('connect')
 def connect():
-    username = session.get("username")
-    if not username:
-        print("kicked, no username in session")
-        raise ConnectionRefusedError("Invalid username")
+    print("New socket connect succese")
+    # username = session.get("username")
+    # if not username:
+    #     print("kicked, no username in session")
+    #     raise ConnectionRefusedError("Invalid username")
+    #
+    # # Add the user to the online users dictionary
+    # online_users[username] = request.sid
+    # emit('connect')
 
-    # Add the user to the online users dictionary
-    online_users[username] = request.sid
-    emit('connect')
+
+@socketio.on('setname')
+def setname(name):
+    online_users[name] = request.sid
 
 @socketio.on('disconnect')
 def disconnect():
@@ -27,12 +33,13 @@ def disconnect():
 
 @socketio.on('message')
 def handle_message(data):
-    print("message recived")
-    username = session.get("username")
-    if not username:
-        return emit('error', {"error": "User not authenticated"})
+    print("message recived data=", data)
+    # username = session.get("username")
+    # if not username:
+    #     return emit('error', {"error": "User not authenticated"})
 
     target_username = data.get('target_username')
+    username = data.get('source_username')
     message = data.get('message')
 
     if not target_username or not message:
@@ -45,10 +52,8 @@ def handle_message(data):
     print(f"{target_username=}, {online_users=}")
     if target_username in online_users:
         target_sid = online_users[target_username]
-        socketio.emit('message_received', {"sender": username, "message": message}, room=target_sid)
+        socketio.emit('message_received', {"source_username": username, "target_username": target_username, "message": message}, room=target_sid)
         print("message received ping sent")
-
-    emit('message_sent', {"message": "Message sent successfully"})
 
 @socketio.on('get_message')
 def handle_get_message(data):
