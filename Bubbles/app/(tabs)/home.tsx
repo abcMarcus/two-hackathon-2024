@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 
 const API_BASE_URL = 'http://sydneyhome.ddns.net:38433';
-const LOCATION_UPDATE_INTERVAL = 60 * 1000; // 1 minutes in milliseconds
+const LOCATION_UPDATE_INTERVAL = 10 * 1000; // 1 minutes in milliseconds
 
 
 
@@ -195,10 +195,11 @@ export default function HomeScreen() {
 
   const getNearbyUsers = async (currentUsername: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/getnearby?username=${currentUsername}&distance_km=1.0`);
+      const response = await fetch(`${API_BASE_URL}/api/getnearby?username=${currentUsername}&distance_km=100`);
       
       if (response.ok) {
         const data = await response.json();
+        console.log('Nearby users data:', JSON.stringify(data, null, 2));
         setNearbyUsers(data.nearby_users);
         console.log('Nearby users:', data.nearby_users);
       } else {
@@ -218,14 +219,14 @@ export default function HomeScreen() {
   const handleBubblePress = (user: NearbyUser) => {
     console.log('home recognises click');
     Alert.alert(
-      `Connect with ${user.username}?`,
+      `Connect with ${user}?`,
       'Would you like to connect with this user?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Yes',
-          onPress: () => console.log(`blud wants to chat with  ${user.username}`)
-            // navigation.navigate('chat/[id]', { userId: user.id, userName: user.name }),
+          onPress: () => console.log(`blud wants to chat with  ${user}`)
+            // navigation.navigate('chat/[id]', { userId: user, userName: user }),
         },
       ],
       { cancelable: true }
