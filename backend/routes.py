@@ -103,7 +103,7 @@ def get_nearby():
 
     nearby_users, message = db.get_nearby_users(username, distance_km)
 
-    return jsonify({"nearby_users": nearby_users, "message": message}), 200
+    return nearby_users, 200
 
 @app.route('/api/get_all_users', methods=['GET'])
 def get_all_users():
