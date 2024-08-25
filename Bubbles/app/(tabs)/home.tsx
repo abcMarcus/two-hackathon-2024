@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 
 const API_BASE_URL = 'http://sydneyhome.ddns.net:38433';
-const LOCATION_UPDATE_INTERVAL = 10 * 1000; // 1 minutes in milliseconds
+const LOCATION_UPDATE_INTERVAL = 5 * 1000; // 1 minutes in milliseconds
 
 
 
@@ -200,8 +200,8 @@ export default function HomeScreen() {
       if (response.ok) {
         const data = await response.json();
         console.log('Nearby users data:', JSON.stringify(data, null, 2));
-        setNearbyUsers(data.nearby_users);
-        console.log('Nearby users:', data.nearby_users);
+        setNearbyUsers(data);
+        console.log('Nearby users:', data.length);
       } else {
         console.error('Failed to get nearby users');
       }
