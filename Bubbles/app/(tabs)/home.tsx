@@ -10,7 +10,7 @@ import { useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 
-const API_BASE_URL = 'http://sydneyhome.ddns.net';
+const API_BASE_URL = 'http://sydneyhome.ddns.net:38433';
 const LOCATION_UPDATE_INTERVAL = 60 * 1000; // 1 minutes in milliseconds
 
 
@@ -28,7 +28,8 @@ const storeCookie = async (name: string, value: string) => {
 
 interface NearbyUser {
   username: string;
-  distance: number;
+  fullname: string;
+  interest: string;
 }
 
 
@@ -42,34 +43,22 @@ const getCookie = async (name: string) => {
   }
 };
 
-type User = {
-  id: number;
-  name: string;
-};
-
-const users: User[] = [
-  { id: 1, name: 'John Doe' },
-  { id: 2, name: 'Jane Smith' },
-  { id: 3, name: 'Alice Johnson' },
-  { id: 4, name: 'Bob Brown' },
-  { id: 5, name: 'Charlie White' },
-  // Add more users here
-];
-
 
 const getBubblePositions = (numBubbles: number) => {
   const { width, height } = Dimensions.get('window');
   const positions = [];
-  const radius = 150; // Radius from center where bubbles will be positioned
+  const radius =  Math.min(width, height) * 0.3; // Radius from center where bubbles will be positioned
+  console.log(`radius = ${radius}`);
   const bubbleSize = 100; // Size of each bubble
 
   for (let i = 0; i < numBubbles; i++) {
     const angle = (i / numBubbles) * 2 * Math.PI; // Full circle angle
+
     const x = radius * Math.cos(angle); // Center and adjust bubble radius
+
     const y = radius * Math.sin(angle); // Center and adjust bubble radius
     positions.push({ left: x, top: y });
   }
-
   return positions;
 };
 
@@ -158,7 +147,7 @@ export default function HomeScreen() {
       let location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
 
-      const response = await fetch(`http://sydneyhome.ddns.net/api/update_location`, {
+      const response = await fetch(`http://sydneyhome.ddns.net:38433/api/update_location`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -222,20 +211,21 @@ export default function HomeScreen() {
 
 
   const navigation = useNavigation();
-  const bubblePositions = getBubblePositions(users.length);
+  const bubblePositions = getBubblePositions(nearbyUsers.length);
   console.log(bubblePositions)
 
 
-  const handleBubblePress = (user: User) => {
+  const handleBubblePress = (user: NearbyUser) => {
     console.log('home recognises click');
     Alert.alert(
-      `Connect with ${user.name}?`,
+      `Connect with ${user.username}?`,
       'Would you like to connect with this user?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Yes',
-          onPress: () => navigation.navigate('chat/[id]', { userId: user.id, userName: user.name }),
+          onPress: () => console.log(`blud wants to chat with  ${user.username}`)
+            // navigation.navigate('chat/[id]', { userId: user.id, userName: user.name }),
         },
       ],
       { cancelable: true }
@@ -254,9 +244,9 @@ export default function HomeScreen() {
 
 
 
-      {users.map((user, index) => (
+      {nearbyUsers.map((user, index) => (
           <Bubble
-          key={user.id}
+          key={`${user}-${index}`}
           style={[
             styles.bubble,
             { top: bubblePositions[index].top, left: bubblePositions[index].left },
@@ -264,15 +254,13 @@ export default function HomeScreen() {
           ]}
           onPress={() => handleBubblePress(user)}
         />
+        
         ))}
 
-      <Bubble key={0} 
-      style={{ backgroundColor: 'transparent', borderWidth: 0, shadowOpacity: 0 }}
-      onPress={() => {}}
-      hide={true} /> 
     </ThemedView>
     </TouchableWithoutFeedback>
   );
+
 }
 
 const styles = StyleSheet.create({
