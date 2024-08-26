@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Input, Button } from '@rneui/themed';
 import styles from '../assets/stylesheet';
 import { useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
+
+const API_BASE_URL = 'http://sydneyhome.ddns.net:38433';
 
 export default function InterestPage() {
     const { userInfoJSON } = useLocalSearchParams();
@@ -12,6 +14,7 @@ export default function InterestPage() {
     const [interestList, setInterestList] = useState([]);
     const [interest, setInterest] = useState("");
     const [interestError, setInterestError] = useState("");
+    const inputRef = useRef(null);
     
     const cleanString = (str: string): string => {
         // Remove special characters, keep only alphanumeric and spaces
@@ -20,7 +23,7 @@ export default function InterestPage() {
 
     const handleBack = () => {
         router.push("/signup");
-      };
+    };
 
     const handleContinue = async (username: string, fullname: string, interests, password: string) => {
         if (!interestList || interestList.length === 0) {
@@ -29,17 +32,17 @@ export default function InterestPage() {
         }
         const interest = interests.join(', ');
         try {
-            const response = await fetch('http://sydneyhome.ddns.net:38433/api/create_user', {
-              method: 'POST',
-              headers: {
+            const response = await fetch(`${API_BASE_URL}/api/create_user`, {
+                method: 'POST',
+                headers: {
                 'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
+            },
+            body: JSON.stringify({
                 username,
                 fullname,
                 interest,
                 password
-              }),
+            }),
             });
         
             if (response.ok) {
@@ -60,6 +63,10 @@ export default function InterestPage() {
           }
     }
 
+    const handleSubmitEditing = () => {
+        addInterestToList();
+    };
+
     const addInterestToList = () => {
         const trimmedInterest = cleanString(interest.trim().toLowerCase());
         if (!interest.trim()) {
@@ -71,6 +78,7 @@ export default function InterestPage() {
         setInterest("");
         setInterestError("");
         }
+        inputRef.current?.focus();
     };
 
     const removeInterest = (index) => {
@@ -91,13 +99,15 @@ export default function InterestPage() {
                 ))}
             </ScrollView>
             <Input
+                ref={inputRef}
                 style={styles.input}
                 placeholder="Add an interest"
                 value={interest}
                 errorStyle={{ color: '#f33958' }}
                 errorMessage={interestError}
+                onSubmitEditing={handleSubmitEditing}
+                blurOnSubmit={false}
                 onChangeText={setInterest}
-                onSubmitEditing={addInterestToList}
                 autoCapitalize="none"
                 rightIcon={
                     <Button
@@ -121,6 +131,7 @@ export default function InterestPage() {
     );
 }
 
+
 const localStyles = StyleSheet.create({
     interestList: {
         maxHeight: 200,
@@ -131,13 +142,28 @@ const localStyles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#f0f0f0',
-        padding: 10,
+        backgroundColor: '#5A5C59',
+        padding: 15,
         marginVertical: 5,
-        borderRadius: 5,
+        borderRadius: 10,
+    },
+    interestText: {
+        color: '#F0F0F0',
+        fontSize: 16,
     },
     removeButton: {
-        color: 'red',
+        color: '#f33958',
         fontWeight: 'bold',
+        fontSize: 18,
+    },
+    addButtonText: {
+        color: '#F0F0F0',
+        fontSize: 16,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginTop: 20,
     },
 });

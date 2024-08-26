@@ -48,6 +48,14 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     color: 'white'
   },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  scrollView: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: 20,
+  },
 });
 
 export default styles;

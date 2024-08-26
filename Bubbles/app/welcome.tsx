@@ -18,6 +18,7 @@ export default function WelcomePage() {
 
   const handleSignIn = (): void => {
     // Add your sign in logic here
+    navigation.navigate('login' as never);
     console.log('Sign In button pressed');
   };
 
