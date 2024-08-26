@@ -147,7 +147,7 @@ export default function HomeScreen() {
       let location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
 
-      const response = await fetch(`http://sydneyhome.ddns.net:38433/api/update_location`, {
+      const response = await fetch(`${API_BASE_URL}/api/update_location`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

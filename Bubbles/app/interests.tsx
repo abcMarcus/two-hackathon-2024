@@ -5,6 +5,8 @@ import styles from '../assets/stylesheet';
 import { useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
 
+const API_BASE_URL = 'http://sydneyhome.ddns.net:38433';
+
 export default function InterestPage() {
     const { userInfoJSON } = useLocalSearchParams();
     const { username, fullname, password } = JSON.parse(userInfoJSON);
@@ -30,7 +32,7 @@ export default function InterestPage() {
         }
         const interest = interests.join(', ');
         try {
-            const response = await fetch('http://sydneyhome.ddns.net:38433/api/create_user', {
+            const response = await fetch(`${API_BASE_URL}/api/create_user`, {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json',

@@ -4,12 +4,14 @@ import { Input } from '@rneui/themed';
 import styles from '../assets/stylesheet';
 import { router, useRouter } from 'expo-router';
 
+const API_BASE_URL = 'http://sydneyhome.ddns.net:38433';
+
 const handleLogin = async (username: string, password: string) => {
   // Here you would typically make an API call to authenticate the user
   // For now, we'll just simulate a successful login
     try {
         console.log('tryin');
-        const response = await fetch(`http://sydneyhome.ddns.net:38433/api/verify_login`, {
+        const response = await fetch(`${API_BASE_URL}/api/verify_login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
